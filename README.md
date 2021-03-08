@@ -1,0 +1,1 @@
+this script is meant to take some activites and the time allocated for them and then generate a schedule visible in the terminal with color and proper time etc
