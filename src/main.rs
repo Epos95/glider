@@ -21,13 +21,15 @@ fn main() {
             .long("new")
             .takes_value(false)
             .exclusive(true))
-        .arg(Arg::new())
+        //.arg(Arg::new())
         .arg(Arg::new("config")
         
     ).get_matches();
 
-    println!("Enter activites and times.\nFormat: <activity> <time modifier>");
-    println!("{:?}", read_stdin());
+    println!("Enter activity and what time to end it.\nFormat: <activity> <time modifier>");
+    let activites = read_stdin();
+    let s = Schedule::new(activites);
+    s.display();
 
     // first get input untill double newline
 
@@ -72,13 +74,4 @@ fn read_stdin() -> Vec<String> {
 
     // Return the vector.
     result_vector
-}
-
-fn parse_time(input: String) -> (i8,i8){
-
-}
-
-/// Creates a Schedule struct from a given Vec\<String\>.
-fn schedule_from_string(input: Vec<String>) -> Schedule {
-
 }
