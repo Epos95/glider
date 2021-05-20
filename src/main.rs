@@ -16,10 +16,18 @@ fn main() {
         .version("1.0")
         .author("Max Agnesund <maxagnesund95ATgmailDOTcom")
         .about("Helps you plan your day and present a graphic schedule")
+        .arg(Arg::new("new")
+            .short('n')
+            .long("new")
+            .takes_value(false)
+            .exclusive(true))
+        .arg(Arg::new())
         .arg(Arg::new("config")
+        
     ).get_matches();
 
-    println!("{:?}", read_stdin())
+    println!("Enter activites and times.\nFormat: <activity> <time modifier>");
+    println!("{:?}", read_stdin());
 
     // first get input untill double newline
 
@@ -55,7 +63,7 @@ fn read_stdin() -> Vec<String> {
             .to_string();
 
         // Return if buffer is empty, otherwise push the string to the result_vector.
-        if buffer.trim() == "" {
+        if buffer.trim().is_empty() {
             break
         } else {
             result_vector.push(buffer);
@@ -66,5 +74,11 @@ fn read_stdin() -> Vec<String> {
     result_vector
 }
 
-// Creates a Schedule struct from a given Vec\<String\>.
-//fn schedule_from_string(input: Vec<String>) -> Schedule {}
+fn parse_time(input: String) -> (i8,i8){
+
+}
+
+/// Creates a Schedule struct from a given Vec\<String\>.
+fn schedule_from_string(input: Vec<String>) -> Schedule {
+
+}
