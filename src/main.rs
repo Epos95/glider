@@ -2,7 +2,8 @@
 // of these they want to use in the schedule and makes drawing the schedule easier
 use clap::{Arg, App};
 use crossterm::style::*;
-
+use glider::*;
+use std::io::{self, Read};
 
 fn main() {
 
@@ -18,6 +19,8 @@ fn main() {
         .arg(Arg::new("config")
     ).get_matches();
 
+    println!("{:?}", read_stdin())
+
     // first get input untill double newline
 
     // sanitize input
@@ -30,3 +33,38 @@ fn main() {
 
     // maybe cache the output for useage in input when re running
 }
+
+/// Reads lines from stdin until a empty row is entered.
+/// 
+/// ## Returns
+/// Returns a Vec\<String\>, strings inside have their new lines removed but that is it.
+fn read_stdin() -> Vec<String> {
+    // Vector to store the read strings in.
+    let mut result_vector = vec![];
+    let stdin = io::stdin();
+
+    // Read lines indefinetly.
+    loop {
+        let mut buffer = String::new();
+        stdin.read_line(&mut buffer)
+            .expect("Could not read input.");
+        
+        // Remove newlines from string.
+        buffer = buffer
+            .trim()
+            .to_string();
+
+        // Return if buffer is empty, otherwise push the string to the result_vector.
+        if buffer.trim() == "" {
+            break
+        } else {
+            result_vector.push(buffer);
+        }
+    }
+
+    // Return the vector.
+    result_vector
+}
+
+// Creates a Schedule struct from a given Vec\<String\>.
+//fn schedule_from_string(input: Vec<String>) -> Schedule {}
