@@ -1,9 +1,9 @@
 mod tests;
 
 // this needs to be serializeable aswell
-/**
- things
- */
+/// A struct representing a drawable schedule.
+/// 
+/// 
 #[derive(Debug)]
 pub struct Schedule {
     activities: Vec<String>,
@@ -17,5 +17,4 @@ impl std::fmt::Display for Schedule {
 }
 
 impl Schedule {
-
 }
