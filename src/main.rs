@@ -12,6 +12,7 @@ fn main() {
     // maybe one for reading from a specified schedule file
     // if the one above: a arg for reading from specific schedule
 
+    // use subcommands here instead
     let matches = App::new("Glider planning programm")
         .version("1.0")
         .author("Max Agnesund <maxagnesund95ATgmailDOTcom")
@@ -21,15 +22,22 @@ fn main() {
             .long("new")
             .takes_value(false)
             .exclusive(true))
-        //.arg(Arg::new())
-        .arg(Arg::new("config")
-        
-    ).get_matches();
+        .arg(Arg::new("read")
+            .short('r')
+            .long("read")
+            .takes_value(true)
+            .exclusive(true))
+        .get_matches();
 
-    println!("Enter activity and what time to end it.\nFormat: <activity> <time modifier>");
-    let activites = read_stdin();
-    let s = Schedule::new(activites);
-    s.display();
+    if matches.is_present("new") {
+        println!("new");
+    } else {
+        println!("TESTING");
+        println!("Enter activity and what time to end it.\nFormat: <activity> <time modifier>");
+        let activites = read_stdin();
+        let s = Schedule::new(activites);
+        s.display();
+    }
 
     // first get input untill double newline
 
@@ -65,8 +73,8 @@ fn read_stdin() -> Vec<String> {
             .to_string();
 
         // Return if buffer is empty, otherwise push the string to the result_vector.
-        if buffer.trim().is_empty() {
-            break
+        if buffer.is_empty() {
+            break;
         } else {
             result_vector.push(buffer);
         }
