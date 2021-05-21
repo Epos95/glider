@@ -13,30 +13,40 @@ fn main() {
     // if the one above: a arg for reading from specific schedule
 
     // use subcommands here instead
-    let matches = App::new("Glider planning programm")
+    let app = App::new("Glider")
         .version("1.0")
         .author("Max Agnesund <maxagnesund95ATgmailDOTcom")
         .about("Helps you plan your day and present a graphic schedule")
-        .arg(Arg::new("new")
-            .short('n')
-            .long("new")
-            .takes_value(false)
-            .exclusive(true))
-        .arg(Arg::new("read")
-            .short('r')
-            .long("read")
-            .takes_value(true)
-            .exclusive(true))
-        .get_matches();
+        .subcommand(App::new("new")
+            .short_flag('n')
+            .about("Creates a new schedule file")
+            .arg(Arg::new("file")
+                .short('f')
+                .long("file")
+                .takes_value(true)))
+        .subcommand(App::new("read")
+            .short_flag('r')
+            .about("Reads a schedule file and prints it")
+            .arg(Arg::new("file")
+                .short('f')
+                .long("file")
+                .takes_value(true)));
 
-    if matches.is_present("new") {
-        println!("new");
-    } else {
-        println!("TESTING");
-        println!("Enter activity and what time to end it.\nFormat: <activity> <time modifier>");
-        let activites = read_stdin();
-        let s = Schedule::new(activites);
-        s.display();
+    // match subcommands.
+    match app.get_matches().subcommand() {
+        Some(("new",  command)) => {
+            // new command.
+        },
+        Some(("read", command)) => {
+            // read command.
+        },
+        _ => {
+            println!("TESTING");
+            println!("Enter activity and what time to end it.\nFormat: <activity> <time modifier>");
+            let activites = read_stdin();
+            let s = Schedule::new(activites);
+            s.display();
+        }
     }
 
     // first get input untill double newline

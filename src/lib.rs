@@ -30,7 +30,7 @@ impl Schedule {
     }
 
     /// This method is a shorthand for just printing the struct.
-    /// Same as Schedule.fmt().
+    /// Same as formatting the schedule with println.
     pub fn display(&self) {
         println!("{}", self);
     }
