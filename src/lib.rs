@@ -10,11 +10,11 @@ pub struct Schedule {
     times: Vec<(i8, i8)>
 }
 
-// This part should do the heavy lifting when it comes to printing 
-// the schedule.
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-       write!(f, "a schedule") 
+        let res = self.as_string().unwrap_or("Error string".to_string());
+
+        write!(f, "{}", res)
     }
 }
 
@@ -22,16 +22,16 @@ impl Schedule {
     /// Creates a new Schedule from a vector of strings (lines).
     pub fn new(input: Vec<String>) -> Self {
         
-        // this method handles all the parsing etc
+        // this method handles all the parsing etcdefault: T
         Schedule {
             activities: vec!["".to_string()],
             times: vec![(3,3)]
         }
     }
 
-    /// This method is a shorthand for just printing the struct.
-    /// Same as formatting the schedule with println.
-    pub fn display(&self) {
-        println!("{}", self);
+    /// This method gets the schedule as a string.
+    /// Printing it later will use this.
+    pub fn as_string(&self) -> Option<String> {
+        Some("x".to_string())
     }
 }

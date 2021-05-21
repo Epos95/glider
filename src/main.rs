@@ -7,11 +7,6 @@ use std::io::{self, Read};
 
 fn main() {
 
-    // what args do we even need?
-    // one for creating a new "stored" file: -n?
-    // maybe one for reading from a specified schedule file
-    // if the one above: a arg for reading from specific schedule
-
     // use subcommands here instead
     let app = App::new("Glider")
         .version("1.0")
@@ -20,14 +15,16 @@ fn main() {
         .subcommand(App::new("new")
             .short_flag('n')
             .about("Creates a new schedule file")
-            .arg(Arg::new("file")
+            .arg(Arg::new("filename")
+                .about("Specifies what name to save the schedule under.")
                 .short('f')
                 .long("file")
                 .takes_value(true)))
         .subcommand(App::new("read")
             .short_flag('r')
             .about("Reads a schedule file and prints it")
-            .arg(Arg::new("file")
+            .arg(Arg::new("filename")
+                .about("Specifies what schedule to read by name.")
                 .short('f')
                 .long("file")
                 .takes_value(true)));
@@ -36,6 +33,12 @@ fn main() {
     match app.get_matches().subcommand() {
         Some(("new",  command)) => {
             // new command.
+
+            let fname = command.value_of("file").unwrap();
+
+
+            // use the current date as file name 
+
         },
         Some(("read", command)) => {
             // read command.
@@ -43,23 +46,22 @@ fn main() {
         _ => {
             println!("TESTING");
             println!("Enter activity and what time to end it.\nFormat: <activity> <time modifier>");
+
+            // first get input untill double newline
             let activites = read_stdin();
+
+            // compile a schedule
+            //   use separate schedule datastructure for this
             let s = Schedule::new(activites);
+
+            // print the schedule
+            //   do this with a impl for schedule
             s.display();
+            println!("{}", s);
+
+            // maybe cache the output for useage in input when re running
         }
     }
-
-    // first get input untill double newline
-
-    // sanitize input
-
-    // compile a schedule
-    //   use separate schedule datastructure for this
-
-    // print the schedule
-    //   do this with a impl for schedule
-
-    // maybe cache the output for useage in input when re running
 }
 
 /// Reads lines from stdin until a empty row is entered.
