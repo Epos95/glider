@@ -12,7 +12,8 @@ pub struct Schedule {
 
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let res = self.as_string().unwrap_or("Error string".to_string());
+        let error_string = String::from("something goes here");
+        let res = self.as_string().unwrap_or(error_string);
 
         write!(f, "{}", res)
     }
@@ -32,6 +33,10 @@ impl Schedule {
     /// This method gets the schedule as a string.
     /// Printing it later will use this.
     pub fn as_string(&self) -> Option<String> {
+        if self.times.len() > 1 && self.activities.len() != self.times.len() {
+            return None;
+        }
+
         Some("x".to_string())
     }
 }
