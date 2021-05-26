@@ -1,9 +1,6 @@
 use crossterm::style::*;
 
-// this needs to be serializeable aswell
 /// A struct representing a drawable schedule.
-/// 
-/// 
 #[derive(Debug)]
 pub struct Schedule {
     activities: Vec<String>,
@@ -49,7 +46,7 @@ fn get_activities(input: &Vec<String>) -> Vec<String> {
     let mut a: Vec<String> = vec![];
     for line in input.iter() {
         let mut s: Vec<String> = line.split(" ").map(|x| x.to_string()).collect();
-        s.pop();
+        s.pop(); // popping elements like this is ugly but might be the best option
         a.push(s.join(" "));
     }
     a
@@ -87,7 +84,6 @@ fn get_times(input: &Vec<String>) -> Option<Vec<(i8,i8)>> {
             }
 
             // This does the job but its probably not the best way of doing things
-            // WOW THIS CAN LITERALLY BE DONE WITH ? OPERATOR FML
             let duo = (twin.get(0).unwrap().parse().unwrap_or(-1), twin.get(1).unwrap().parse().unwrap_or(-1));
 
             if 24 > duo.0 && duo.0 > 0 && 60 > duo.1 && duo.1 > 0 {
