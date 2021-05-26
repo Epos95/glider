@@ -33,10 +33,10 @@ fn main() {
         Some(("new",  command)) => {
             // new command.
 
-            let fname = command.value_of("file").unwrap();
+            let fname = command
+                .value_of("file"); // make this return the current date as a string
 
-
-            // use the current date as file name 
+            println!("{:?}", fname);
 
         },
         Some(("read", command)) => {
