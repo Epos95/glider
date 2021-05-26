@@ -33,7 +33,7 @@ impl Schedule {
     /// This method gets the schedule as a string.
     /// Printing it later will use this.
     pub fn as_string(&self) -> Option<String> {
-        if self.times.len() > 1 && self.activities.len() != self.times.len() {
+        if self.times.len() > 0 && self.activities.len() != self.times.len() {
             return None;
         }
 
