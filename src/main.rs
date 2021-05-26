@@ -3,11 +3,10 @@
 use clap::{Arg, App};
 use crossterm::style::*;
 use glider::*;
-use std::io::{self, Read};
+use std::io;
 
 fn main() {
 
-    // use subcommands here instead
     let app = App::new("Glider")
         .version("1.0")
         .author("Max Agnesund <maxagnesund95ATgmailDOTcom")
@@ -35,9 +34,9 @@ fn main() {
             // new command.
 
             let fname = command
-                .value_of("file") // make this return the current date as a string
+                .value_of("file"); // make this return the current date as a string
 
-            println!("{}", fname);
+            println!("{:?}", fname);
 
         },
         Some(("read", command)) => {
@@ -45,20 +44,24 @@ fn main() {
         },
         _ => {
             println!("TESTING");
-            println!("Enter activity and what time to end it.\nFormat: <activity> <time modifier>");
+            println!("Enter activity and what time to end it.\nFormat: <activity> <end time (hour:minute) || (hour)>");
 
             // first get input untill double newline
             let activites = read_stdin();
 
-            // compile a schedule
-            //   use separate schedule datastructure for this
-            let s = Schedule::new(activites);
+            // create a schedule
+            let s = if let Some(s) = Schedule::new(activites) {
+                s
+            } else {
+                // print error info and return since it makes 
+                // sense to just have the user restart the program 
+                // if they want to try again
+                println!("{}: Invalid inputs", "Error".red());
+                return;
+            };
 
             // print the schedule
-            //   do this with a impl for schedule
             println!("{}", s);
-
-            // maybe cache the output for useage in input when re running
         }
     }
 }
