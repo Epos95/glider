@@ -9,7 +9,7 @@ pub struct Schedule {
 
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let res = self.as_string().red();
+        let res = self.as_string().unwrap_or("Error String".to_string()).red();
 
         write!(f, "{}", res)
     }
@@ -34,11 +34,20 @@ impl Schedule {
     /// This method gets the schedule as a string.
     /// 
     /// as_string is used internally to format a Schedule when printing aswell.
-    pub fn as_string(&self) -> String {
+    pub fn as_string(&self) -> Option<String> {
+        // This function can fail since input can still be:
+        //  In the wrong order
+        //  probably some other stuff
         
        let rstr = String::from("this is a something");
 
-       rstr
+       // for every activity, time in vectors:
+       //   check if ordering is correct
+       //   get blocksize based on time
+       //   format string according to blocksize
+       //   
+
+       Some(rstr)
     }
 }
 
@@ -95,6 +104,9 @@ fn get_times(input: &Vec<String>) -> Option<Vec<(i8,i8)>> {
             // This does the job but its probably not the best way of doing things
             // tuples are kinda unwieldy ime so far
             let duo = (twin.get(0).unwrap().parse().unwrap_or(-1), twin.get(1).unwrap().parse().unwrap_or(-1));
+
+            panic!("ROUND SECOND PART OF DUO TO 20 MIN INTERVAL");
+            
 
             if 24 > duo.0 && duo.0 > 0 && 60 > duo.1 && duo.1 > 0 {
                 time = duo;

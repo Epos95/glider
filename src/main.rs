@@ -26,6 +26,7 @@ fn main() {
                 .about("Specifies what schedule to read by name.")
                 .short('f')
                 .long("file")
+                .required(true)
                 .takes_value(true)));
 
     // match subcommands.
@@ -34,23 +35,31 @@ fn main() {
             // new command.
 
             let fname = command
-                .value_of("file"); // make this return the current date as a string
+                .value_of("file")
+                .unwrap_or("ao"); // Get the current date here
 
             println!("{:?}", fname);
 
         },
         Some(("read", command)) => {
             // read command.
+
+            // Check value of command
+
+            // get the file
+
+            // parse the file into a schedule
+
+            // print the parsed schedule
         },
         _ => {
-            println!("TESTING");
             println!("Enter activity and what time to end it.\nFormat: <activity> <end time (hour:minute) || (hour)>");
 
             // first get input untill double newline
-            let activites = read_stdin();
+            let input_lines = read_stdin();
 
             // create a schedule
-            let s = if let Some(s) = Schedule::new(activites) {
+            let s = if let Some(s) = Schedule::new(input_lines) {
                 s
             } else {
                 // print error info and return since it makes 
