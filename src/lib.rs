@@ -4,12 +4,14 @@ use crossterm::style::*;
 #[derive(Debug)]
 pub struct Schedule {
     activities: Vec<String>,
-    times: Vec<(i8, i8)>
+    times: Vec<(i16, i16)>
 }
 
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let res = self.as_string().unwrap_or("Error String".to_string()).on_green();
+        // add pretty colors etc here
+
+        let res = self.as_string().expect("Could not represent schedule as a string.");
 
         write!(f, "{}", res)
     }
@@ -19,7 +21,7 @@ impl Schedule {
     /// Creates a new Schedule from a vector of strings (lines).
     pub fn new(input: Vec<String>) -> Option<Self> {
         let activities: Vec<String> = get_activities(&input);
-        let times: Vec<(i8, i8)> = get_times(&input)?;
+        let times: Vec<(i16, i16)> = get_times(&input)?;
 
         if activities.is_empty() || times.is_empty() {
             None
@@ -35,14 +37,38 @@ impl Schedule {
     /// 
     /// as_string is used internally to format a Schedule when printing aswell.
     pub fn as_string(&self) -> Option<String> {
-        // This function can fail since input can still be:
-        //  In the wrong order
-        //  probably some other stuff
 
        let mut rstr = String::new();
         
         for (i, activity) in self.activities.iter().enumerate() {
-            rstr = format!("{}\n{}", rstr, activity);
+            let mut minutes = self.times.get(i)?.1.to_string();
+            if minutes.len() == 1 {
+                minutes = "00".to_string();
+            }
+
+            let block_height = if i == 0 {
+                // Epoch = First viable time
+                let epoch = 9;
+
+                ((((self.times[i].0 - epoch)*60) + self.times[i].1) / 20) as i16
+            } else {
+                ((((self.times[i].0 - self.times[i-1].0)*60) + (self.times[i].1 - self.times[i].1)) / 20) as i16
+            };
+            println!("block height is {}", block_height);
+
+            for j in 0..block_height {
+                if j == (block_height/2) {
+                    rstr = format!("{}\n\"{}\" untill: {}:{}", rstr, activity.to_owned().on_red(), self.times.get(i)?.0, minutes);
+                } else {
+                    rstr = format!("{}\n{}", rstr, "███████████████████████".green())
+                }
+            }
+            
+            if block_height == 0 {
+                rstr = format!("{}\n\"{}\" untill: {}:{}", rstr, activity.to_owned().on_red(), self.times.get(i)?.0, minutes);
+            }
+        
+
         }
         
        // for every activity, time in vectors:
@@ -74,7 +100,7 @@ fn get_activities(input: &Vec<String>) -> Vec<String> {
 
 /// Parses times from a Vec\<String\>
 /// (is very dirtily written)
-fn get_times(input: &Vec<String>) -> Option<Vec<(i8,i8)>> {
+fn get_times(input: &Vec<String>) -> Option<Vec<(i16,i16)>> {
     let mut times = vec![];
     for line in input.iter() {
         let mut splat: Vec<String> = line
@@ -82,12 +108,12 @@ fn get_times(input: &Vec<String>) -> Option<Vec<(i8,i8)>> {
             .map(|x| x.to_string())
             .collect();
         
-        let time: (i8, i8);
+        let time: (i16, i16);
         
         // first case: gets the singular number (time)
         // second case: (time:time)
         if splat.len() > 0 && splat.last().unwrap().chars().all(char::is_numeric) {
-            let r = splat.pop()?.parse::<i8>().ok()?;
+            let r = splat.pop()?.parse::<i16>().ok()?;
 
             if r > 24 || r < 0 {
                 return None;
