@@ -38,9 +38,13 @@ impl Schedule {
         // This function can fail since input can still be:
         //  In the wrong order
         //  probably some other stuff
-        
-       let rstr = String::from("this is a something");
 
+       let mut rstr = String::new();
+        
+        for (i, activity) in self.activities.iter().enumerate() {
+            rstr = format!("{}\n{}", rstr, activity);
+        }
+        
        // for every activity, time in vectors:
        //   check if ordering is correct
        //   get blocksize based on time
