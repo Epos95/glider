@@ -4,6 +4,7 @@ use clap::{Arg, App};
 use crossterm::style::*;
 use glider::*;
 use std::io;
+use std::fs::*;
 
 fn main() {
 
@@ -36,7 +37,7 @@ fn main() {
 
             let fname = command
                 .value_of("file")
-                .unwrap_or("ao"); // Get the current date here
+                .unwrap_or("date"); // Get the current date here
 
             println!("{:?}", fname);
 
@@ -44,13 +45,22 @@ fn main() {
         Some(("read", command)) => {
             // read command.
 
-            // Check value of command
+            // Get value of command
+            let command_value = command.value_of("read").unwrap();
 
-            // get the file
+            // Get file pointer
+            let mut fp = if let Ok(f) = File::open(command_value) {
+                f
+            } else {
+                println!(" {}: Couldnt open file.", "Error".red());
+                return;
+            };
 
-            // parse the file into a schedule
+            // Parse the file into a schedule
+            let mut contents = String::new();
+            //fp.read_to_string(contents).unwrap();
 
-            // print the parsed schedule
+            // Print the parsed schedule
         },
         _ => {
             println!("Enter activity and what time to end it.\nFormat: <activity> <end time (hour:minute) || (hour)>");

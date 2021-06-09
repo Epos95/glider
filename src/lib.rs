@@ -9,7 +9,7 @@ pub struct Schedule {
 
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let res = self.as_string().unwrap_or("Error String".to_string()).red();
+        let res = self.as_string().unwrap_or("Error String".to_string()).on_green();
 
         write!(f, "{}", res)
     }
@@ -83,12 +83,13 @@ fn get_times(input: &Vec<String>) -> Option<Vec<(i8,i8)>> {
         // first case: gets the singular number (time)
         // second case: (time:time)
         if splat.len() > 0 && splat.last().unwrap().chars().all(char::is_numeric) {
-            time = if let Ok(n) = splat.pop().unwrap().parse() {
-                (n, 0)
-            } else {
-                // invalid input
+            let r = splat.pop()?.parse::<i8>().ok()?;
+
+            if r > 24 || r < 0 {
                 return None;
-            }; 
+            }
+
+            time = (r, 0);
         } else if splat.len() > 0 && splat.last().unwrap().contains(':') {
             let twin: Vec<String> = splat
                 .pop()
@@ -103,12 +104,17 @@ fn get_times(input: &Vec<String>) -> Option<Vec<(i8,i8)>> {
 
             // This does the job but its probably not the best way of doing things
             // tuples are kinda unwieldy ime so far
-            let duo = (twin.get(0).unwrap().parse().unwrap_or(-1), twin.get(1).unwrap().parse().unwrap_or(-1));
-
-            panic!("ROUND SECOND PART OF DUO TO 20 MIN INTERVAL");
-            
+            let mut duo = (twin.get(0).unwrap().parse().unwrap_or(-1), twin.get(1).unwrap().parse().unwrap_or(-1));
 
             if 24 > duo.0 && duo.0 > 0 && 60 > duo.1 && duo.1 > 0 {
+                // we need to round duo.1 to a 20 min interval here
+                if duo.1 > 0 && duo.1 < 20 {
+                    duo.1 = 20;
+                } else if duo.1 >= 20 && duo.1 < 40 {
+                    duo.1 = 40;
+                } else if duo.1 >= 40 && duo.1 < 60 {
+                    duo.1 = 59;
+                } 
                 time = duo;
             } else {
                 return None;
