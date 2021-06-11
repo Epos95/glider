@@ -72,8 +72,8 @@ fn main() {
             // first get input untill double newline
             let input_lines = read_stdin();
 
-            // create a schedule
-            let s = if let Some(s) = Schedule::new(input_lines) {
+            // create a schedule with a start of day of 10 o clock
+            let s = if let Some(s) = Schedule::new(input_lines, 10) {
                 s
             } else {
                 // print error info and return since it makes

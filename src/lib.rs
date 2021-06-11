@@ -5,7 +5,13 @@ use crossterm::style::*;
 pub struct Schedule {
     activities: Vec<String>,
     times: Vec<(i16, i16)>,
+    start_of_day: i16,
 }
+
+// ISSUES:
+// block height and block time are not consequential
+// rounding is fucked in various parts of the program
+
 
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -14,79 +20,108 @@ impl std::fmt::Display for Schedule {
         let res = self
             .as_string()
             .expect("Could not represent schedule as a string.");
+        
+        for line in res {
+            if line.contains("█") {
+                write!(f, "{}\n", line).unwrap();
+            } else {
+                let mut x = line.chars().collect::<Vec<char>>();
+                x[7] = '█';
+                write!(f, "{}\n", x.into_iter().collect::<String>()).unwrap();
+            }
 
-        write!(f, "{}", res)
+        }
+        write!(f,"")
+
+        //write!(f, "{}", res.join("\n"))
     }
 }
 
+
 impl Schedule {
     /// Creates a new Schedule from a vector of strings (lines).
-    pub fn new(input: Vec<String>) -> Option<Self> {
+    pub fn new(input: Vec<String>, start_of_day: i16) -> Option<Self> {
         let activities: Vec<String> = get_activities(&input);
         let times: Vec<(i16, i16)> = get_times(&input)?;
 
-        if activities.is_empty() || times.is_empty() {
+        if activities.is_empty() || times.is_empty() || start_of_day < 0 || start_of_day > 24 {
             None
         } else {
-            Some(Schedule { activities, times })
+            Some(Schedule {
+                activities,
+                times,
+                start_of_day,
+            })
         }
     }
 
     /// This method gets the schedule as a string.
     ///
     /// as_string is used internally to format a Schedule when printing aswell.
-    pub fn as_string(&self) -> Option<String> {
-        // use a vector here
-        let rstr = vec![];
+    pub fn as_string(&self) -> Option<Vec<String>> {
+        let mut rstr = vec![];
+        let mut ctime = format!("{}:00", self.start_of_day);
+        // use string.push() instead of format!
 
-        for (i, activity) in self.activities.iter().enumerate() {
-            let mut minutes = self.times.get(i)?.1.to_string();
-            if minutes.len() == 1 {
-                minutes = "00".to_string();
-            }
+        for i in 0..self.activities.len() {
+            let minutes = if self.times.get(i)?.1.to_string().len() == 1 {
+                "00".to_string()
+            } else {
+                self.times.get(i)?.1.to_string()
+            };
 
             let block_height = if i == 0 {
-                // Epoch = First viable time
-                let epoch = 9;
+                if self.start_of_day > self.times[i].0 {
+                    return None;
+                }
 
-                ((((self.times[i].0 - epoch) * 60) + self.times[i].1) / 20) as i16
+                ((((self.times[i].0 - self.start_of_day) * 60) + self.times[i].1) / 20) as i16
             } else {
                 ((((self.times[i].0 - self.times[i - 1].0) * 60)
                     + (self.times[i].1 - self.times[i].1))
                     / 20) as i16
             };
-            println!("block height is {}", block_height);
 
-            for j in 0..block_height {
-                if j == (block_height / 2) {
-                    rstr = format!(
-                        "{}\n\"{}\" untill: {}:{}",
-                        rstr,
-                        activity.to_owned().on_red(),
-                        self.times.get(i)?.0,
-                        minutes
-                    );
-                } else {
-                    rstr = format!("{}\n{}", rstr, "███████████████████████".green())
-                }
-            }
+            // DEBUG
+            println!(
+                "[DEBUG] Block height is: {} \n[DEBUG] Block time is: {}",
+                block_height,
+                block_height * 20
+            );
+            rstr.push(format!(
+                " {} {} ",
+                &ctime,
+                &"█".repeat(get_longest_activity(&self.activities).len() + 11)
+            ));
 
             if block_height == 0 {
-                rstr = format!(
-                    "{}\n\"{}\" untill: {}:{}",
-                    rstr,
-                    activity.to_owned().on_red(),
+                rstr.push(format!(
+                    "{}{} | {}:{}",
+                    " ".repeat(11 - ctime.len() + 2),
+                    self.activities[i].to_owned(),
                     self.times.get(i)?.0,
                     minutes
-                );
+                ));
+            } else {
+                for c in 0..block_height {
+                    if c == block_height / 2 {
+                        rstr.push(format!(
+                            "{}{} // {}:{}",
+                            " ".repeat(11 - ctime.len() + 2),
+                            self.activities[i].to_owned(),
+                            self.times.get(i)?.0,
+                            minutes
+                        ));
+                    } else {
+                        rstr.push(format!(
+                            "{}{}",
+                            " ".repeat(ctime.len() + 2),
+                            &"█".repeat(get_longest_activity(&self.activities).len() + 11)
+                        ));
+                    }
+                }
             }
         }
-
-        // for every activity, time in vectors:
-        //   check if ordering is correct
-        //   get blocksize based on time
-        //   format string according to blocksize
-        //
 
         Some(rstr)
     }
@@ -106,6 +141,19 @@ fn get_activities(input: &Vec<String>) -> Vec<String> {
         a.push(s.join(" "));
     }
     a
+}
+
+/// Gets the longest string of a vector of strings
+fn get_longest_activity(v: &Vec<String>) -> String {
+    let mut s = String::from("");
+
+    for string in v {
+        if string.len() > s.len() {
+            s = string.clone();
+        }
+    }
+
+    s
 }
 
 /// Parses times from a Vec\<String\>
