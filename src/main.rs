@@ -5,6 +5,8 @@ use crossterm::style::*;
 use glider::*;
 use std::fs::*;
 use std::io;
+use std::io::BufReader;
+use std::io::prelude::*;
 
 fn main() {
     let app = App::new("Glider")
@@ -53,18 +55,28 @@ fn main() {
             let command_value = command.value_of("read").unwrap();
 
             // Get file pointer
-            let mut fp = if let Ok(f) = File::open(command_value) {
+            let fp = if let Ok(f) = File::open(command_value) {
                 f
             } else {
                 println!(" {}: Couldnt open file.", "Error".red());
                 return;
             };
+            let b = BufReader::new(fp);
+
+            // Get the contents of the file as a vector
+            let contents = b.lines().map(|l| l.unwrap()).collect();
 
             // Parse the file into a schedule
-            let mut contents = String::new();
-            //fp.read_to_string(contents).unwrap();
+            let s = if let Some(s) = Schedule::new(contents, 10) {
+                s
+            } else {
+                println!("{}: Invalid inputs", "Error".red());
+                return;
+            };
+
 
             // Print the parsed schedule
+            println!("{}", s);
         }
         _ => {
             println!("Enter activity and what time to end it.\nFormat: <activity> <end time (hour:minute) || (hour)>");
