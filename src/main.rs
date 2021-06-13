@@ -2,11 +2,12 @@
 // of these they want to use in the schedule and makes drawing the schedule easier
 use clap::{App, Arg};
 use crossterm::style::*;
-use glider::*;
 use std::fs::*;
 use std::io;
-use std::io::BufReader;
 use std::io::prelude::*;
+use std::io::BufReader;
+
+mod schedule;
 
 fn main() {
     let app = App::new("Glider")
@@ -67,13 +68,12 @@ fn main() {
             let contents = b.lines().map(|l| l.unwrap()).collect();
 
             // Parse the file into a schedule
-            let s = if let Some(s) = Schedule::new(contents, 10) {
+            let s = if let Some(s) = schedule::Schedule::new(contents, 10) {
                 s
             } else {
                 println!("{}: Invalid inputs", "Error".red());
                 return;
             };
-
 
             // Print the parsed schedule
             println!("{}", s);
@@ -85,7 +85,7 @@ fn main() {
             let input_lines = read_stdin();
 
             // create a schedule with a start of day of 10 o clock
-            let s = if let Some(s) = Schedule::new(input_lines, 10) {
+            let s = if let Some(s) = schedule::Schedule::new(input_lines, 10) {
                 s
             } else {
                 // print error info and return since it makes
@@ -103,7 +103,7 @@ fn main() {
 
 /// Reads lines from stdin until a empty row is entered.
 ///
-/// ## Returns
+/// # Returns
 /// Returns a Vec\<String\>, strings inside have their new lines removed but that is it.
 fn read_stdin() -> Vec<String> {
     // Vector to store the read strings in.
