@@ -8,44 +8,30 @@ pub struct Schedule {
     start_of_day: i16,
 }
 
-// ISSUES:
-// block height and blocksize are not consequential
-// rounding is fucked in various parts of the program
-// color system still doesnt work
-// print time at the end aswell
-// formatting work still done in fmt for schedule, move this to as_string
-// maybe move struct definition into a separete file, keep the helper functions in lib
+/* 
+ * ISSUES:
+ * block height and blocksize are not consequential
+ * rounding is fucked in various parts of the program
+ * color system still doesnt work
+ * print time at the end aswell
+ * printing a schedule is still kinda weird
+ */
 
 
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // add pretty colors etc here
 
         let res = self
             .as_string()
             .expect("Could not represent schedule as a string.");
         
         for line in res {
-            if line.contains("█") {
+            if line.matches("█").count() > 2 {
+                // Print entirety with color
                 write!(f, "{}\n", line).unwrap();
             } else {
-
-                // This could be placed in as_string 
-                let mut x = line.chars().collect::<Vec<char>>();
-                x[7] = '█';
-
-                // extend the string to place the last block in the right position
-                for i in 0..get_longest_activity(&self.activities).len()+19 {
-                    match x.get(i) {
-                        None => {
-                            x.push(' ');
-                        },
-                        _ => {}
-                    }
-                }
-                x.push('█');
-
-                write!(f, "{}\n", x.into_iter().collect::<String>()).unwrap();
+                // print the first and last character with color
+                write!(f, "{}\n",line).unwrap();
             }
 
         }
@@ -114,21 +100,23 @@ impl Schedule {
             // push the time
             if block_height == 0 {
                 rstr.push(format!(
-                    "{}{} // {}:{}",
-                    " ".repeat(11 - ctime.len() + 3),
+                    "{}█ {} // {}:{}{}█",
+                    " ".repeat(11 - ctime.len() + 1),
                     self.activities[i].to_owned(),
                     self.times.get(i)?.0,
-                    minutes
+                    minutes,
+                    " ".repeat(get_longest_activity(&self.activities).len()-self.activities[i].len()+1)    
                 ));
             } else {
                 for c in 0..block_height {
                     if c == block_height / 2 {
                         rstr.push(format!(
-                            "{}{} // {}:{}",
-                            " ".repeat(11 - ctime.len() + 3),
+                            "{}█ {} // {}:{}{}█",
+                            " ".repeat(11 - ctime.len()+1),
                             self.activities[i].to_owned(),
                             self.times.get(i)?.0,
-                            minutes
+                            minutes,
+                            " ".repeat(get_longest_activity(&self.activities).len()-self.activities[i].len()+1)    
                         ));
                     } else {
                         rstr.push(format!(

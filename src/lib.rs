@@ -36,6 +36,7 @@ pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
     for line in input.iter() {
         let mut splat: Vec<String> = line.split(" ").map(|x| x.to_string()).collect();
 
+        // maybe assign this at declare time
         let time: (i16, i16);
 
         // first case: gets the singular number (time)
@@ -69,11 +70,11 @@ pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
 
             if 24 > duo.0 && duo.0 > 0 && 60 > duo.1 && duo.1 > 0 {
                 // we need to round duo.1 to a 20 min interval here
-                if duo.1 > 0 && duo.1 < 20 {
+                if duo.1 > 0 && duo.1 < 21 {
                     duo.1 = 20;
-                } else if duo.1 >= 20 && duo.1 < 40 {
+                } else if duo.1 >= 21 && duo.1 < 41 {
                     duo.1 = 40;
-                } else if duo.1 >= 40 && duo.1 < 60 {
+                } else if duo.1 >= 41 && duo.1 < 60 {
                     duo.1 = 59;
                 }
                 time = duo;
