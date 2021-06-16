@@ -1,11 +1,12 @@
-// maybe treat 15 minutes as the smallest unit of time, then the user can specify how many
-// of these they want to use in the schedule and makes drawing the schedule easier
 use clap::{App, Arg};
 use crossterm::style::*;
 use std::fs::*;
 use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
+
+#[cfg(test)]
+mod test;
 
 mod schedule;
 
@@ -23,6 +24,7 @@ fn main() {
                         .about("Specifies what name to save the schedule under.")
                         .short('f')
                         .long("file")
+                        .required(true)
                         .takes_value(true),
                 ),
         )
@@ -50,7 +52,9 @@ fn main() {
             println!("{:?}", fname);
         }
         Some(("read", command)) => {
+            
             // read command.
+            panic!("just use fs::read_to_string lmao");
 
             // Get value of command
             let command_value = command.value_of("read").unwrap();

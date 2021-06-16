@@ -8,7 +8,7 @@ pub struct Schedule {
     start_of_day: i16,
 }
 
-/* 
+/*
  * ISSUES:
  * block height and blocksize are not consequential
  * rounding is fucked in various parts of the program
@@ -17,31 +17,27 @@ pub struct Schedule {
  * printing a schedule is still kinda weird
  */
 
-
 impl std::fmt::Display for Schedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-
         let res = self
             .as_string()
             .expect("Could not represent schedule as a string.");
-        
+
         for line in res {
             if line.matches("█").count() > 2 {
                 // Print entirety with color
                 write!(f, "{}\n", line).unwrap();
             } else {
                 // print the first and last character with color
-                write!(f, "{}\n",line).unwrap();
+                write!(f, "{}\n", line).unwrap();
             }
-
         }
-        write!(f,"")
+        write!(f, "")
     }
 }
 
-
 impl Schedule {
-    /// Creates a new Schedule from a vector of strings (lines) and a integer 
+    /// Creates a new Schedule from a vector of strings (lines) and a integer
     /// of when to start the day.
     pub fn new(input: Vec<String>, start_of_day: i16) -> Option<Self> {
         let activities: Vec<String> = get_activities(&input);
@@ -105,18 +101,23 @@ impl Schedule {
                     self.activities[i].to_owned(),
                     self.times.get(i)?.0,
                     minutes,
-                    " ".repeat(get_longest_activity(&self.activities).len()-self.activities[i].len()+1)    
+                    " ".repeat(
+                        get_longest_activity(&self.activities).len() - self.activities[i].len() + 1
+                    )
                 ));
             } else {
                 for c in 0..block_height {
                     if c == block_height / 2 {
                         rstr.push(format!(
-                            "{}█ {} // {}:{}{}█",
+                            "{}█ {} // {}:{}{} █",
                             " ".repeat(11 - ctime.len()+1),
                             self.activities[i].to_owned(),
                             self.times.get(i)?.0,
                             minutes,
-                            " ".repeat(get_longest_activity(&self.activities).len()-self.activities[i].len()+1)    
+                            " ".repeat(
+                                get_longest_activity(&self.activities).len()
+                                    - self.activities[i].len()
+                            )
                         ));
                     } else {
                         rstr.push(format!(

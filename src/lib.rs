@@ -1,4 +1,3 @@
-
 /// Parses activites from a input vector of strings
 ///
 /// Input is a reference to the vector of unparsed lines directly from read_stdin().
@@ -29,7 +28,7 @@ pub fn get_longest_activity(v: &Vec<String>) -> String {
 }
 
 /// Parses times from a Vec\<String\>
-/// 
+///
 /// (is very dirtily written)
 pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
     let mut times = vec![];
