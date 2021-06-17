@@ -16,11 +16,9 @@ pub struct Schedule {
 
 /*
  * ISSUES:
- * block height and blocksize are not consequential
- * rounding is fucked in various parts of the program
- * color system still doesnt work
- * printing a schedule is still kinda weird
+ * lib.rs needs a touch up
  * proper commenting
+ * ctime gets printed in colors, we want to prevent this 
  */
 
 impl std::fmt::Display for Schedule {
@@ -39,11 +37,11 @@ impl std::fmt::Display for Schedule {
                 write!(f, "{}{}{}\n", SetForegroundColor(*color),line, SetForegroundColor(Color::Reset)).unwrap();
             } else {
                 // print the first and last character with color
-                write!(f, "{}{} {}{}{}{}{}\n",
+                write!(f, "       {}{}{}{} {}{}{}\n",
                     SetForegroundColor(*color),
                     "█".to_string(),
                     SetForegroundColor(Color::Reset),
-                    line[7..line.len()-2].to_string(),
+                    line[10..line.len()-4].to_string(),
                     SetForegroundColor(*color),
                     "█".to_string(),
                     SetForegroundColor(Color::Reset)
@@ -69,7 +67,6 @@ impl Schedule {
             Color::Blue,
             Color::Cyan,
             Color::Green,
-            Color::Grey,
             Color::Magenta,
             Color::Red,
             Color::Yellow
