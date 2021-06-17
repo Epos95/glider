@@ -1,4 +1,9 @@
 use glider::*;
+use crossterm::style::Color;
+use crossterm::style::SetForegroundColor;
+use rand::Rng;
+use rand::prelude::SliceRandom;
+
 
 /// A struct representing a drawable schedule.
 #[derive(Debug)]
@@ -6,6 +11,7 @@ pub struct Schedule {
     activities: Vec<String>,
     times: Vec<(i16, i16)>,
     start_of_day: i16,
+    colors: Vec<Color>
 }
 
 /*
@@ -14,6 +20,7 @@ pub struct Schedule {
  * rounding is fucked in various parts of the program
  * color system still doesnt work
  * printing a schedule is still kinda weird
+ * proper commenting
  */
 
 impl std::fmt::Display for Schedule {
@@ -22,13 +29,29 @@ impl std::fmt::Display for Schedule {
             .as_string()
             .expect("Could not represent schedule as a string.");
 
-        for line in res {
+
+        println!("|colors| = {}, |a| = {}", self.colors.len(), self.activities.len());
+        let mut color_ctr = 0;
+        for (i, line) in res.iter().enumerate() {
+            let color = self.colors.get(color_ctr).unwrap();
             if line.matches("█").count() > 2 {
                 // Print entirety with color
-                write!(f, "{}\n", line).unwrap();
+                write!(f, "{}{}{}\n", SetForegroundColor(*color),line, SetForegroundColor(Color::Reset)).unwrap();
             } else {
                 // print the first and last character with color
-                write!(f, "{}\n", line).unwrap();
+                write!(f, "{}{} {}{}{}{}{}\n",
+                    SetForegroundColor(*color),
+                    "█".to_string(),
+                    SetForegroundColor(Color::Reset),
+                    line[7..line.len()-2].to_string(),
+                    SetForegroundColor(*color),
+                    "█".to_string(),
+                    SetForegroundColor(Color::Reset)
+                ).unwrap();
+            }
+
+            if &line[..4] != "    " && i != 0 {
+                color_ctr += 1;
             }
         }
         write!(f, "")
@@ -41,6 +64,47 @@ impl Schedule {
     pub fn new(input: Vec<String>, start_of_day: i16) -> Option<Self> {
         let activities: Vec<String> = get_activities(&input);
         let times: Vec<(i16, i16)> = get_times(&input)?;
+        let mut colors: Vec<Color> = vec![
+            Color::Black,
+            Color::Blue,
+            Color::Cyan,
+            Color::Green,
+            Color::Grey,
+            Color::Magenta,
+            Color::Red,
+            Color::Yellow
+        ];
+
+        let mut rng = rand::thread_rng();
+
+        if colors.len() < activities.len() {
+            // we need more colors, randomly push more of them
+            let l = colors.len();
+
+            while colors.len() != activities.len() {
+                colors.push(colors[rng.gen_range(0..l)]);
+            }
+
+            colors.shuffle(&mut rng);
+
+            let mut saved_color = colors.last().unwrap();
+            for (i, color) in colors.clone().iter().enumerate() {
+                if saved_color == color {
+                    let e = colors.remove(i);
+                    colors.push(e);
+                }
+                saved_color = color;
+            }
+            
+        } else {
+            // randomly pop elements untill we have the same length as activites
+            while colors.len() != activities.len() {
+                colors.remove(rng.gen_range(0..colors.len()));
+            }
+
+            colors.shuffle(&mut rng);
+        }
+    
 
         if activities.is_empty() || times.is_empty() || start_of_day < 0 || start_of_day > 24 {
             None
@@ -49,6 +113,7 @@ impl Schedule {
                 activities,
                 times,
                 start_of_day,
+                colors,
             })
         }
     }
@@ -85,6 +150,7 @@ impl Schedule {
                 block_height,
                 block_height * 20
             );
+            
             // push row of bars
             rstr.push(format!(
                 " {} {} ",
