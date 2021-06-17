@@ -52,7 +52,6 @@ fn main() {
             println!("{:?}", fname);
         }
         Some(("read", command)) => {
-            
             // read command.
             panic!("just use fs::read_to_string lmao");
 

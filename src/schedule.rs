@@ -13,7 +13,6 @@ pub struct Schedule {
  * block height and blocksize are not consequential
  * rounding is fucked in various parts of the program
  * color system still doesnt work
- * print time at the end aswell
  * printing a schedule is still kinda weird
  */
 
@@ -110,7 +109,7 @@ impl Schedule {
                     if c == block_height / 2 {
                         rstr.push(format!(
                             "{}█ {} // {}:{}{} █",
-                            " ".repeat(11 - ctime.len()+1),
+                            " ".repeat(11 - ctime.len() + 1),
                             self.activities[i].to_owned(),
                             self.times.get(i)?.0,
                             minutes,
@@ -131,6 +130,9 @@ impl Schedule {
             ctime = format!("{}:{}", self.times.get(i)?.0, minutes);
         }
 
+        let n = rstr.len();
+        rstr[n-1] = format!(" {} {}", ctime, &"█".repeat(get_longest_activity(&self.activities).len() + 13));
+        
         Some(rstr)
     }
 }
