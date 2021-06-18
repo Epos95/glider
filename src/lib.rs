@@ -40,7 +40,7 @@ pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
 
         // first case: gets the singular number (time)
         // second case: (time:time)
-        if splat.len() > 0 && splat.last().unwrap().chars().all(char::is_numeric) {
+        if splat.len() > 0 && splat.last()?.chars().all(char::is_numeric) {
             let r = splat.pop()?.parse::<i16>().ok()?;
 
             if r > 24 || r < 0 {
@@ -48,10 +48,9 @@ pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
             }
 
             time = (r, 0);
-        } else if splat.len() > 0 && splat.last().unwrap().contains(':') {
+        } else if splat.len() > 0 && splat.last()?.contains(':') {
             let twin: Vec<String> = splat
-                .pop()
-                .unwrap()
+                .pop()?
                 .split(":")
                 .map(|x| x.to_string())
                 .collect();
@@ -63,8 +62,8 @@ pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
             // This does the job but its probably not the best way of doing things
             // tuples are kinda unwieldy ime so far
             let mut duo = (
-                twin.get(0).unwrap().parse().unwrap_or(-1),
-                twin.get(1).unwrap().parse().unwrap_or(-1),
+                twin.get(0)?.parse().unwrap_or(-1),
+                twin.get(1)?.parse().unwrap_or(-1),
             );
 
             if 24 > duo.0 && duo.0 > 0 && 60 > duo.1 && duo.1 > 0 {

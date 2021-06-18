@@ -17,3 +17,21 @@ fn simple_test1() {
     let s = schedule::Schedule::new(input_lines, 10).unwrap();
     println!("{}", s);
 }
+
+#[test]
+fn long_test1() {
+    let input_lines = vec![
+        "test 11".to_string(),
+        "test more  12".to_string(),
+        "cook 13".to_string(),
+        "eat 14".to_string(),
+        "more 15".to_string(),
+        "test 16".to_string(),
+        "school 17".to_string(),
+        "asd 18".to_string(),
+        "ajsd 19".to_string(),
+    ];
+    let s = schedule::Schedule::new(input_lines, 10).unwrap();
+    println!("{}", s);
+
+}

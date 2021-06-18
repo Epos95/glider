@@ -1,6 +1,8 @@
 use glider::*;
-use crossterm::style::Color;
 use crossterm::style::SetForegroundColor;
+use crossterm::style::Color;
+use crossterm::style::SetAttribute;
+use crossterm::style::Attributes;
 use rand::Rng;
 use rand::prelude::SliceRandom;
 
@@ -16,9 +18,12 @@ pub struct Schedule {
 
 /*
  * ISSUES:
+ * block size sometimes doesnt match up with how many rows gets printed!
  * lib.rs needs a touch up
  * proper commenting
  * ctime gets printed in colors, we want to prevent this 
+ * format ctime as bold and text as italics
+ * some type annotations are missing
  */
 
 impl std::fmt::Display for Schedule {
@@ -48,7 +53,7 @@ impl std::fmt::Display for Schedule {
                 ).unwrap();
             }
 
-            if &line[..4] != "    " && i != 0 {
+            if line.chars().nth(1).unwrap().is_numeric() && i != 0 {
                 color_ctr += 1;
             }
         }
@@ -63,7 +68,6 @@ impl Schedule {
         let activities: Vec<String> = get_activities(&input);
         let times: Vec<(i16, i16)> = get_times(&input)?;
         let mut colors: Vec<Color> = vec![
-            Color::Black,
             Color::Blue,
             Color::Cyan,
             Color::Green,
@@ -84,15 +88,13 @@ impl Schedule {
 
             colors.shuffle(&mut rng);
 
-            let mut saved_color = colors.last().unwrap();
-            for (i, color) in colors.clone().iter().enumerate() {
-                if saved_color == color {
+            for i in 1..colors.len() {
+                if colors[i] == colors[i-1] {
                     let e = colors.remove(i);
                     colors.push(e);
+                    println!("did things");
                 }
-                saved_color = color;
             }
-            
         } else {
             // randomly pop elements untill we have the same length as activites
             while colors.len() != activities.len() {
@@ -160,11 +162,11 @@ impl Schedule {
                 rstr.push(format!(
                     "{}█ {} // {}:{}{}█",
                     " ".repeat(11 - ctime.len() + 1),
-                    self.activities[i].to_owned(),
+                    self.activities.get(i)?.to_owned(),
                     self.times.get(i)?.0,
                     minutes,
                     " ".repeat(
-                        get_longest_activity(&self.activities).len() - self.activities[i].len() + 1
+                        get_longest_activity(&self.activities).len() - self.activities.get(i)?.len() + 1
                     )
                 ));
             } else {
