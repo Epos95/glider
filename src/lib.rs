@@ -49,11 +49,7 @@ pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
 
             time = (r, 0);
         } else if splat.len() > 0 && splat.last()?.contains(':') {
-            let twin: Vec<String> = splat
-                .pop()?
-                .split(":")
-                .map(|x| x.to_string())
-                .collect();
+            let twin: Vec<String> = splat.pop()?.split(":").map(|x| x.to_string()).collect();
 
             if twin.len() != 2 {
                 return None;

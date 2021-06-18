@@ -33,5 +33,4 @@ fn long_test1() {
     ];
     let s = schedule::Schedule::new(input_lines, 10).unwrap();
     println!("{}", s);
-
 }

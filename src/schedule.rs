@@ -1,11 +1,10 @@
-use glider::*;
-use crossterm::style::SetForegroundColor;
+use crossterm::style::Attributes;
 use crossterm::style::Color;
 use crossterm::style::SetAttribute;
-use crossterm::style::Attributes;
-use rand::Rng;
+use crossterm::style::SetForegroundColor;
+use glider::*;
 use rand::prelude::SliceRandom;
-
+use rand::Rng;
 
 /// A struct representing a drawable schedule.
 #[derive(Debug)]
@@ -13,7 +12,7 @@ pub struct Schedule {
     activities: Vec<String>,
     times: Vec<(i16, i16)>,
     start_of_day: i16,
-    colors: Vec<Color>
+    colors: Vec<Color>,
 }
 
 /*
@@ -21,9 +20,10 @@ pub struct Schedule {
  * block size sometimes doesnt match up with how many rows gets printed!
  * lib.rs needs a touch up
  * proper commenting
- * ctime gets printed in colors, we want to prevent this 
+ * ctime gets printed in colors, we want to prevent this
  * format ctime as bold and text as italics
  * some type annotations are missing
+ * maybe add support for timeedit?
  */
 
 impl std::fmt::Display for Schedule {
@@ -32,25 +32,33 @@ impl std::fmt::Display for Schedule {
             .as_string()
             .expect("Could not represent schedule as a string.");
 
-
-        println!("|colors| = {}, |a| = {}", self.colors.len(), self.activities.len());
         let mut color_ctr = 0;
         for (i, line) in res.iter().enumerate() {
             let color = self.colors.get(color_ctr).unwrap();
             if line.matches("█").count() > 2 {
                 // Print entirety with color
-                write!(f, "{}{}{}\n", SetForegroundColor(*color),line, SetForegroundColor(Color::Reset)).unwrap();
+                write!(
+                    f,
+                    "{}{}{}\n",
+                    SetForegroundColor(*color),
+                    line,
+                    SetForegroundColor(Color::Reset)
+                )
+                .unwrap();
             } else {
                 // print the first and last character with color
-                write!(f, "       {}{}{}{} {}{}{}\n",
+                write!(
+                    f,
+                    "       {}{}{}{} {}{}{}\n",
                     SetForegroundColor(*color),
                     "█".to_string(),
                     SetForegroundColor(Color::Reset),
-                    line[10..line.len()-4].to_string(),
+                    line[10..line.len() - 4].to_string(),
                     SetForegroundColor(*color),
                     "█".to_string(),
                     SetForegroundColor(Color::Reset)
-                ).unwrap();
+                )
+                .unwrap();
             }
 
             if line.chars().nth(1).unwrap().is_numeric() && i != 0 {
@@ -73,7 +81,7 @@ impl Schedule {
             Color::Green,
             Color::Magenta,
             Color::Red,
-            Color::Yellow
+            Color::Yellow,
         ];
 
         let mut rng = rand::thread_rng();
@@ -89,7 +97,7 @@ impl Schedule {
             colors.shuffle(&mut rng);
 
             for i in 1..colors.len() {
-                if colors[i] == colors[i-1] {
+                if colors[i] == colors[i - 1] {
                     let e = colors.remove(i);
                     colors.push(e);
                     println!("did things");
@@ -103,7 +111,7 @@ impl Schedule {
 
             colors.shuffle(&mut rng);
         }
-    
+
         if activities.is_empty() || times.is_empty() || start_of_day < 0 || start_of_day > 24 {
             None
         } else {
@@ -148,7 +156,7 @@ impl Schedule {
                 block_height,
                 block_height * 20
             );
-            
+
             // push row of bars
             rstr.push(format!(
                 " {} {} ",
@@ -165,7 +173,9 @@ impl Schedule {
                     self.times.get(i)?.0,
                     minutes,
                     " ".repeat(
-                        get_longest_activity(&self.activities).len() - self.activities.get(i)?.len() + 1
+                        get_longest_activity(&self.activities).len()
+                            - self.activities.get(i)?.len()
+                            + 1
                     )
                 ));
             } else {
@@ -195,8 +205,12 @@ impl Schedule {
         }
 
         let n = rstr.len();
-        rstr[n-1] = format!(" {} {}", ctime, &"█".repeat(get_longest_activity(&self.activities).len() + 13));
-        
+        rstr[n - 1] = format!(
+            " {} {}",
+            ctime,
+            &"█".repeat(get_longest_activity(&self.activities).len() + 13)
+        );
+
         Some(rstr)
     }
 }

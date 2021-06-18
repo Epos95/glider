@@ -6,7 +6,7 @@ use std::io::prelude::*;
 use std::io::BufReader;
 
 #[cfg(test)]
-mod test;
+mod tests;
 
 mod schedule;
 
