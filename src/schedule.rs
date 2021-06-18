@@ -104,7 +104,6 @@ impl Schedule {
             colors.shuffle(&mut rng);
         }
     
-        
 
         if activities.is_empty() || times.is_empty() || start_of_day < 0 || start_of_day > 24 {
             None
