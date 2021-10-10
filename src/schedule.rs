@@ -22,7 +22,6 @@ pub struct Schedule {
  * lib.rs needs a touch up
  * proper commenting
  * some type annotations are missing
- * ctime gets printed in colors, we want to prevent this
  * format ctime as bold and text as italics
  * small_test1 fails spectacuraely, needs to handle sub 1hour tasks better
  */
@@ -36,7 +35,10 @@ impl std::fmt::Display for Schedule {
         let mut color_ctr = 0;
         for (i, line) in res.iter().enumerate() {
             let color = self.colors.get(color_ctr).unwrap();
-            if line.matches("█").count() > 2 {
+
+            // to fix "ctime gets printed in color" we can check if the 
+            // first part of the line is numbers and then print better
+            if line.matches("█").count() > 10 && line.chars().nth(3) != Some(':') {
                 // Print entirety with color
                 write!(
                     f,
@@ -46,6 +48,20 @@ impl std::fmt::Display for Schedule {
                     SetForegroundColor(Color::Reset)
                 )
                 .unwrap();
+            } else if line.chars().nth(3) == Some(':') {
+                // print ctime on its own
+                let (ctime, rest_of_line) = line.split_at(7);
+
+                write!(
+                    f,
+                    "{}{}{}{}\n",
+                    // maybe make ctime cursive or something here
+                    ctime,
+                    SetForegroundColor(*color),
+                    rest_of_line,
+                    SetForegroundColor(Color::Reset)
+
+                ).unwrap();
             } else {
                 // print the first and last character with color
                 write!(
@@ -89,19 +105,20 @@ impl Schedule {
 
         if colors.len() < activities.len() {
             // we need more colors, randomly push more of them
-            let l = colors.len();
+            let saved_length = colors.len();
 
+            // push colors untill we have one for every activity
             while colors.len() != activities.len() {
-                colors.push(colors[rng.gen_range(0..l)]);
+                colors.push(colors[rng.gen_range(0..saved_length)]);
             }
 
             colors.shuffle(&mut rng);
 
+            // make sure two colors doesnt follow each other; doesnt work
             for i in 1..colors.len() {
                 if colors[i] == colors[i - 1] {
                     let e = colors.remove(i);
                     colors.push(e);
-                    println!("did things");
                 }
             }
         } else {
@@ -152,11 +169,14 @@ impl Schedule {
             };
 
             // DEBUG
+            /*
             println!(
                 "[DEBUG] Block height is: {} \n[DEBUG] Block time is: {}",
                 block_height,
                 block_height * 20
             );
+            */
+
 
             // push row of bars
             rstr.push(format!(
