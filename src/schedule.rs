@@ -17,13 +17,14 @@ pub struct Schedule {
 
 /*
  * ISSUES:
+ * logic for creating vector of times is borked
  * block size sometimes doesnt match up with how many rows gets printed!
  * lib.rs needs a touch up
  * proper commenting
+ * some type annotations are missing
  * ctime gets printed in colors, we want to prevent this
  * format ctime as bold and text as italics
- * some type annotations are missing
- * maybe add support for timeedit?
+ * small_test1 fails spectacuraely, needs to handle sub 1hour tasks better
  */
 
 impl std::fmt::Display for Schedule {

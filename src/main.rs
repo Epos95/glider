@@ -1,19 +1,19 @@
+mod schedule;
+#[cfg(test)]
+mod tests;
+
 use clap::{App, Arg};
 use crossterm::style::*;
+use schedule::Schedule;
 use std::fs::*;
 use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
 
-#[cfg(test)]
-mod tests;
-
-mod schedule;
-
 fn main() {
     let app = App::new("Glider")
         .version("1.0")
-        .author("Max Agnesund <maxagnesund95ATgmailDOTcom")
+        .author("Epos")
         .about("Helps you plan your day and present a graphic schedule")
         .subcommand(
             App::new("new")
@@ -50,7 +50,7 @@ fn main() {
             let fname = command.value_of("file").unwrap_or("date"); // Get the current date here
 
             println!("{:?}", fname);
-        }
+        },
         Some(("read", command)) => {
             // read command.
             panic!("just use fs::read_to_string lmao");
@@ -80,7 +80,7 @@ fn main() {
 
             // Print the parsed schedule
             println!("{}", s);
-        }
+        },
         _ => {
             println!("Enter activity and what time to end it.\nFormat: <activity> <end time (hour:minute) || (hour)>");
 
@@ -88,7 +88,7 @@ fn main() {
             let input_lines = read_stdin();
 
             // create a schedule with a start of day of 10 o clock
-            let s = if let Some(s) = schedule::Schedule::new(input_lines, 10) {
+            let s = if let Some(s) = Schedule::new(input_lines, 10) {
                 s
             } else {
                 // print error info and return since it makes
@@ -116,10 +116,14 @@ fn read_stdin() -> Vec<String> {
     // Read lines indefinetly.
     loop {
         let mut buffer = String::new();
-        stdin.read_line(&mut buffer).expect("Could not read input.");
+        stdin
+            .read_line(&mut buffer)
+            .expect("Could not read input.");
 
         // Remove newlines from string.
-        buffer = buffer.trim().to_string();
+        buffer = buffer
+            .trim()
+            .to_string();
 
         // Return if buffer is empty, otherwise push the string to the result_vector.
         if buffer.is_empty() {

@@ -29,7 +29,7 @@ pub fn get_longest_activity(v: &Vec<String>) -> String {
 
 /// Parses times from a Vec\<String\>
 ///
-/// (is very dirtily written)
+/// (is very dirtily written) ew
 pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
     let mut times = vec![];
     for line in input.iter() {
@@ -56,12 +56,16 @@ pub fn get_times(input: &Vec<String>) -> Option<Vec<(i16, i16)>> {
             }
 
             // This does the job but its probably not the best way of doing things
-            // tuples are kinda unwieldy ime so far
-            let mut duo = (
-                twin.get(0)?.parse().unwrap_or(-1),
-                twin.get(1)?.parse().unwrap_or(-1),
-            );
+            // tuples are kinda unwieldy ime
+            let mut duo = (twin.get(0)?.parse().ok()?, twin.get(1)?.parse().ok()?);
 
+            // Rewrite this logic so that small_test1 passes
+            // to do this we might have to check for duplicate times
+            // and handle them by either telling the user to fuck off
+            // or being responsible and ignoring specific ones (ez rt >>)
+            // problem is rounding to the nearest 20th minute, this just doesnt work
+            // tbh we could just change the smallest amount of time availible
+            // and panic if we find something that is not a multiplicative of it
             if 24 > duo.0 && duo.0 > 0 && 60 > duo.1 && duo.1 > 0 {
                 // we need to round duo.1 to a 20 min interval here
                 if duo.1 > 0 && duo.1 < 21 {
