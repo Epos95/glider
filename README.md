@@ -9,3 +9,8 @@ format of input:
 
 info:
     allocated time distinguish how big the time block should be in the terminal
+
+### Todo list:
+* Rewrite to use actual errors with a proper returning "main" function
+* let GliderError::InvalidInput print the input which is invalid
+* Fix the smallest number increment error (see `cargo test -- --show-output` for more info)

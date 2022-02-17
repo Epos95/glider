@@ -2,13 +2,12 @@ mod schedule;
 #[cfg(test)]
 mod tests;
 
-use clap::{App, Arg};
+use clap::{App, Arg, ArgMatches};
 use crossterm::style::*;
 use schedule::Schedule;
-use std::fs::*;
 use std::io;
-use std::io::prelude::*;
-use std::io::BufReader;
+use std::fs;
+use glider::GliderError;
 
 fn main() {
     let app = App::new("Glider")
@@ -42,45 +41,54 @@ fn main() {
                 ),
         );
 
-    // match subcommands.
-    match app.get_matches().subcommand() {
+    match handle_command(app.get_matches()) {
+        Err(GliderError::InvalidInput) => {
+            println!("{}: Invalid inputs", "Error".red());
+        }
+        Err(GliderError::OpenFileError) => {
+            println!(" {}: Couldnt open file.", "Error".red());
+        }
+        Ok(s) => {
+            println!("{}", s);
+        }
+    }
+}
+
+fn handle_command(matches: ArgMatches) -> Result<Schedule, GliderError> {
+    match matches.subcommand() {
         Some(("new", command)) => {
             // new command.
 
             let fname = command.value_of("file").unwrap_or("date"); // Get the current date here
 
             println!("{:?}", fname);
-        },
+
+            return Err(GliderError::OpenFileError);
+        }
         Some(("read", command)) => {
             // read command.
-            panic!("just use fs::read_to_string lmao");
+            //panic!("just use fs::read_to_string lmao");
 
             // Get value of command
-            let command_value = command.value_of("read").unwrap();
+            let file_name = command.value_of("read").unwrap();
 
-            // Get file pointer
-            let fp = if let Ok(f) = File::open(command_value) {
-                f
+            // Could implement into for `GliderError`
+            let content: Vec<String> = if let Ok(s) = fs::read_to_string(file_name) {
+                s.lines().map(|x| x.to_string()).collect()
             } else {
-                println!(" {}: Couldnt open file.", "Error".red());
-                return;
+                return Err(GliderError::OpenFileError);
             };
-            let b = BufReader::new(fp);
-
-            // Get the contents of the file as a vector
-            let contents = b.lines().map(|l| l.unwrap()).collect();
 
             // Parse the file into a schedule
-            let s = if let Some(s) = schedule::Schedule::new(contents, 10) {
+            let s = if let Some(s) = schedule::Schedule::new(content, 10) {
                 s
             } else {
-                println!("{}: Invalid inputs", "Error".red());
-                return;
+                return Err(GliderError::InvalidInput);
             };
 
             // Print the parsed schedule
-            println!("{}", s);
-        },
+            return Ok(s);
+        }
         _ => {
             println!("Enter activity and what time to end it.\nFormat: <activity> <end time (hour:minute) || (hour)>");
 
@@ -88,26 +96,26 @@ fn main() {
             let input_lines = read_stdin();
 
             // create a schedule with a start of day of 10 o clock
-            let s = if let Some(s) = Schedule::new(input_lines, 10) {
+            let s: Schedule = if let Some(s) = Schedule::new(input_lines, 10) {
                 s
             } else {
                 // print error info and return since it makes
                 // sense to just have the user restart the program
                 // if they want to try again
-                println!("{}: Invalid inputs", "Error".red());
-                return;
+                return Err(GliderError::InvalidInput);
             };
 
-            // print the schedule
-            println!("{}", s);
+            return Ok(s);
         }
     }
 }
 
 /// Reads lines from stdin until a empty row is entered.
 ///
+///
 /// # Returns
-/// Returns a Vec\<String\>, strings inside have their new lines removed but that is it.
+///
+/// * Returns a `Vec<String>`, strings inside have their new lines removed but that is it.
 fn read_stdin() -> Vec<String> {
     // Vector to store the read strings in.
     let mut result_vector = vec![];
@@ -116,14 +124,10 @@ fn read_stdin() -> Vec<String> {
     // Read lines indefinetly.
     loop {
         let mut buffer = String::new();
-        stdin
-            .read_line(&mut buffer)
-            .expect("Could not read input.");
+        stdin.read_line(&mut buffer).expect("Could not read input.");
 
         // Remove newlines from string.
-        buffer = buffer
-            .trim()
-            .to_string();
+        buffer = buffer.trim().to_string();
 
         // Return if buffer is empty, otherwise push the string to the result_vector.
         if buffer.is_empty() {

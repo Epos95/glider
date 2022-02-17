@@ -36,7 +36,7 @@ impl std::fmt::Display for Schedule {
         for (i, line) in res.iter().enumerate() {
             let color = self.colors.get(color_ctr).unwrap();
 
-            // to fix "ctime gets printed in color" we can check if the 
+            // to fix "ctime gets printed in color" we can check if the
             // first part of the line is numbers and then print better
             if line.matches("█").count() > 10 && line.chars().nth(3) != Some(':') {
                 // Print entirety with color
@@ -60,8 +60,8 @@ impl std::fmt::Display for Schedule {
                     SetForegroundColor(*color),
                     rest_of_line,
                     SetForegroundColor(Color::Reset)
-
-                ).unwrap();
+                )
+                .unwrap();
             } else {
                 // print the first and last character with color
                 write!(
@@ -176,7 +176,6 @@ impl Schedule {
                 block_height * 20
             );
             */
-
 
             // push row of bars
             rstr.push(format!(
